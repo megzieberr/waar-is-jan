@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Waar is Jan?</title>
+  <meta name="description" content="Jan's shifts: is he at the mine or off duty?">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#4A1A12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Waar is Jan?">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Saira+Stencil+One&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <h1 class="brand">Waar is Jan?</h1>
+      <p class="clock" id="clock"></p>
+    </header>
+
+    <main>
+      <!-- TODAY -->
+      <section class="view" id="view-today" role="tabpanel" aria-labelledby="tab-today">
+        <div class="board" id="board" aria-hidden="true">
+          <div class="peg" data-peg="mine">
+            <span class="peg-label">At the mine</span>
+            <span class="peg-pin"></span>
+          </div>
+          <div class="peg" data-peg="off">
+            <span class="peg-label">Off duty</span>
+            <span class="peg-pin"></span>
+          </div>
+          <div class="tag-slot" id="tag-slot">
+            <div class="tag" id="tag">
+              <span class="tag-hole"></span>
+              <span class="tag-name">Jan</span>
+              <span class="tag-sub">Shift B</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="answer" aria-live="polite">
+          <p class="kicker" id="today-kicker">Right now</p>
+          <h2 class="answer-head" id="answer-head"></h2>
+          <p class="answer-line" id="answer-line1"></p>
+          <p class="answer-line answer-line--soft" id="answer-line2"></p>
+        </div>
+
+        <div class="hivis" aria-hidden="true"></div>
+
+        <section class="coming" aria-labelledby="coming-title">
+          <h3 class="kicker" id="coming-title">Coming up</h3>
+          <ol class="stretches" id="stretches"></ol>
+          <p class="weekend" id="weekend"></p>
+        </section>
+      </section>
+
+      <!-- WEEK -->
+      <section class="view" id="view-week" role="tabpanel" aria-labelledby="tab-week" hidden>
+        <div class="pager">
+          <button class="pager-btn" id="week-prev" type="button" aria-label="Previous week">&#8249;</button>
+          <div class="pager-title">
+            <h2 id="week-title"></h2>
+            <p id="week-sub"></p>
+          </div>
+          <button class="pager-btn" id="week-next" type="button" aria-label="Next week">&#8250;</button>
+        </div>
+        <button class="back-btn" id="week-back" type="button" hidden>Back to this week</button>
+        <div class="axis" aria-hidden="true">
+          <span style="left:0%">00</span><span style="left:25%">06</span><span style="left:50%">12</span><span style="left:75%">18</span><span style="left:100%">24</span>
+        </div>
+        <ul class="week" id="week-rows"></ul>
+      </section>
+
+      <!-- MONTH -->
+      <section class="view" id="view-month" role="tabpanel" aria-labelledby="tab-month" hidden>
+        <div class="pager">
+          <button class="pager-btn" id="month-prev" type="button" aria-label="Previous month">&#8249;</button>
+          <div class="pager-title">
+            <h2 id="month-title"></h2>
+            <p id="month-sub"></p>
+          </div>
+          <button class="pager-btn" id="month-next" type="button" aria-label="Next month">&#8250;</button>
+        </div>
+        <button class="back-btn" id="month-back" type="button" hidden>Back to this month</button>
+        <div class="month-head" aria-hidden="true">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <div class="month" id="month-grid"></div>
+        <p class="detail" id="month-detail" aria-live="polite"></p>
+        <ul class="legend">
+          <li><span class="swatch swatch--D"></span>Day shift 07:00–19:00</li>
+          <li><span class="swatch swatch--T"></span>Training 08:00–15:00</li>
+          <li><span class="swatch swatch--O"></span>Off duty</li>
+          <li><span class="swatch swatch--hol"></span>Public holiday</li>
+        </ul>
+        <p class="note" id="month-note"></p>
+      </section>
+    </main>
+
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-today" data-view="today" aria-controls="view-today" aria-selected="true" type="button">Today</button>
+      <button class="tab" role="tab" id="tab-week" data-view="week" aria-controls="view-week" aria-selected="false" tabindex="-1" type="button">Week</button>
+      <button class="tab" role="tab" id="tab-month" data-view="month" aria-controls="view-month" aria-selected="false" tabindex="-1" type="button">Month</button>
+    </nav>
+  </div>
+
+  <script src="roster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

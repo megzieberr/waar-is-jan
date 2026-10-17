@@ -1,0 +1,16 @@
+{
+  "name": "Waar is Jan?",
+  "short_name": "Waar is Jan?",
+  "description": "Jan's shifts: is he at the mine or off duty?",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFE3CF",
+  "theme_color": "#4A1A12",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
