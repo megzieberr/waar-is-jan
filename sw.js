@@ -1,5 +1,5 @@
 // Bump VERSION whenever any app file changes.
-const VERSION = 'waar-is-jan-v1';
+const VERSION = 'waar-is-jan-v2';
 const SHELL = [
   './',
   'index.html',

@@ -18,6 +18,8 @@
   --silver: #E4E4DE;
   --state-mine: #9C3B22;
   --state-off: #45602F;
+  --night: #3D3A66;
+  --night-ink: #F3ECDD;
   --focus: #1C6FD1;
 
   --board-hi: #5A2116;
@@ -45,6 +47,8 @@
     --silver: #B9B9B2;
     --state-mine: #FF7A2E;
     --state-off: #A3C283;
+    --night: #8C86D6;
+    --night-ink: #16100D;
     --focus: #7FB2FF;
     color-scheme: dark;
   }
@@ -465,6 +469,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .fill { position: absolute; top: 0; bottom: 0; border-radius: 6px; }
 .fill--D { background: var(--hivis); }
 .fill--T { background: var(--brass); }
+.fill--N { background: var(--night); }
 
 .now {
   position: absolute;
@@ -514,8 +519,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .mcell.c-D { background: var(--hivis); color: #2A130A; }
 .mcell.c-T { background: var(--brass); color: #2A1A05; }
+.mcell.c-N { background: var(--night); color: var(--night-ink); }
 .mcell.c-O { background: var(--off-cell); color: var(--ink); }
-.mcell.c-D:focus-visible, .mcell.c-T:focus-visible { outline-color: var(--ink); }
+.mcell.c-D:focus-visible, .mcell.c-T:focus-visible, .mcell.c-N:focus-visible { outline-color: var(--ink); }
 
 .mcell.is-today::after {
   content: '';
@@ -564,6 +570,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .swatch { width: 14px; height: 14px; border-radius: 4px; }
 .swatch--D { background: var(--hivis); }
 .swatch--T { background: var(--brass); }
+.swatch--N { background: var(--night); }
 .swatch--O { background: var(--off-cell); box-shadow: inset 0 0 0 1px var(--line-strong); }
 .swatch--hol { width: 9px; height: 9px; border-radius: 50%; background: var(--rust); }
 

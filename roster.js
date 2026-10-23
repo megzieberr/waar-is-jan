@@ -9,10 +9,19 @@
   const CHECKED_FROM = '2026-01-01';
   const CHECKED_UNTIL = '2027-01-31'; // last day on the official sheet
 
+  // Times are minutes after midnight. An end past 24:00 runs into the next
+  // morning (night shift ends 06:00 the next day).
   const SHIFTS = {
     D: { name: 'Day shift', start: 7 * 60, end: 19 * 60 },
     T: { name: 'Training', start: 8 * 60, end: 15 * 60 },
+    N: { name: 'Night shift', start: 18 * 60, end: 30 * 60 },
     O: null,
+  };
+
+  // One-off changes to the roster. These win over PATTERN.
+  const CHANGES = {
+    '2026-10-26': 'N', // was day shift
+    '2026-10-27': 'N', // was day shift
   };
 
   // South African public holidays (2026 from the roster sheet, 2027 added).
@@ -53,9 +62,16 @@
   const dayNumber = (d) =>
     Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - ANCHOR_UTC) / 864e5);
 
-  const codeFor = (d) => PATTERN[((dayNumber(d) % 28) + 28) % 28];
+  const codeFor = (d) => CHANGES[iso(d)] || PATTERN[((dayNumber(d) % 28) + 28) % 28];
   const isWork = (d) => codeFor(d) !== 'O';
   const shiftFor = (d) => SHIFTS[codeFor(d)];
+  const isChanged = (d) => iso(d) in CHANGES;
+
+  // Minutes into d that yesterday's night shift is still running (0 if none).
+  function carryInto(d) {
+    const prev = shiftFor(addDays(d, -1));
+    return prev && prev.end > 1440 ? prev.end - 1440 : 0;
+  }
   const holidayFor = (d) => HOLIDAYS[iso(d)] || null;
   const isChecked = (d) => iso(d) >= CHECKED_FROM && iso(d) <= CHECKED_UNTIL;
 
@@ -101,18 +117,23 @@
 
   function statusAt(now) {
     const today = startOfDay(now);
+    const mins = now.getHours() * 60 + now.getMinutes();
+    // Still on last night's night shift: count the minutes from yesterday.
+    if (mins < carryInto(today)) {
+      const code = codeFor(addDays(today, -1));
+      return { today, code, shift: SHIFTS[code], mins: mins + 1440, phase: 'during', atWork: true };
+    }
     const code = codeFor(today);
     const shift = SHIFTS[code];
-    const mins = now.getHours() * 60 + now.getMinutes();
     let phase = 'off-day';
     if (shift) phase = mins < shift.start ? 'before' : mins < shift.end ? 'during' : 'after';
     return { today, code, shift, mins, phase, atWork: phase === 'during' };
   }
 
   const api = {
-    PATTERN, SHIFTS, HOLIDAYS, CHECKED_UNTIL,
+    PATTERN, SHIFTS, CHANGES, HOLIDAYS, CHECKED_UNTIL,
     iso, startOfDay, addDays, dayNumber,
-    codeFor, isWork, shiftFor, holidayFor, isChecked,
+    codeFor, isWork, shiftFor, isChanged, carryInto, holidayFor, isChecked,
     stretchAt, stretchesAfter, nextWorkDay, nextFreeWeekend, statusAt,
   };
 

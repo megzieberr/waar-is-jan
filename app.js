@@ -9,7 +9,7 @@
 
   const pad = (n) => String(n).padStart(2, '0');
   const hm = (mins) => `${pad(Math.floor(mins / 60))}:${pad(mins % 60)}`;
-  const hours = (shift) => `${hm(shift.start)}–${hm(shift.end)}`;
+  const hours = (shift) => `${hm(shift.start)}–${hm(shift.end % 1440)}`;
   const fmtDay = (d) => `${DAY[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`;
   const sameDay = (a, b) => R.iso(a) === R.iso(b);
   const daysBetween = (a, b) => R.dayNumber(b) - R.dayNumber(a);
@@ -38,7 +38,9 @@
 
   function shiftLabel(d) {
     const shift = R.shiftFor(d);
-    return shift ? `${shift.name}, ${hours(shift)}` : 'Off duty';
+    if (shift) return `${shift.name}, ${hours(shift)}`;
+    const carry = R.carryInto(d);
+    return carry ? `Off duty from ${hm(carry)}` : 'Off duty';
   }
 
   /* ---------------- Today ---------------- */
@@ -48,7 +50,7 @@
   function backAtWork(today) {
     const next = R.nextWorkDay(R.addDays(today, 1));
     const shift = R.shiftFor(next);
-    const what = R.codeFor(next) === 'T' ? ' for training' : '';
+    const what = { T: ' for training', N: ' for night shift' }[R.codeFor(next)] || '';
     return `Back at the mine ${whenWord(next, today)} at ${hm(shift.start)}${what}`;
   }
 
@@ -110,12 +112,18 @@
       let note = '';
       if (s.work) {
         const training = [];
+        const nights = [];
         for (let d = s.start; d <= s.end; d = R.addDays(d, 1)) {
           if (R.codeFor(d) === 'T') training.push(d);
+          if (R.codeFor(d) === 'N') nights.push(d);
         }
-        note = training.length
-          ? `${fmtDay(training[0])} is training, ${hours(R.SHIFTS.T)}`
-          : `Day shifts, ${hours(R.SHIFTS.D)}`;
+        const parts = [];
+        if (training.length) parts.push(`${fmtDay(training[0])} is training, ${hours(R.SHIFTS.T)}`);
+        if (nights.length) {
+          const when = nights.length > 1 ? `Night shifts ${fmtRange(nights[0], nights[nights.length - 1])}` : `${fmtDay(nights[0])} is night shift`;
+          parts.push(`${when}, ${hours(R.SHIFTS.N)}`);
+        }
+        note = parts.length ? parts.join(' · ') : `Day shifts, ${hours(R.SHIFTS.D)}`;
       }
       const hols = [];
       for (let d = s.start; d <= s.end; d = R.addDays(d, 1)) {
@@ -175,9 +183,12 @@
       const isToday = sameDay(d, today);
       const holiday = R.holidayFor(d);
 
-      const fill = shift
-        ? `<span class="fill fill--${code}" style="left:${(shift.start / 1440) * 100}%;width:${((shift.end - shift.start) / 1440) * 100}%"></span>`
-        : '';
+      const bar = (c, from, to) =>
+        `<span class="fill fill--${c}" style="left:${(from / 1440) * 100}%;width:${((to - from) / 1440) * 100}%"></span>`;
+      // A night shift is drawn up to midnight here and finishes on the next row.
+      const carry = R.carryInto(d);
+      const fill = (carry ? bar(R.codeFor(R.addDays(d, -1)), 0, carry) : '')
+        + (shift ? bar(code, shift.start, Math.min(shift.end, 1440)) : '');
       const nowMins = now.getHours() * 60 + now.getMinutes();
       const nowLine = isToday ? `<span class="now" style="left:${(nowMins / 1440) * 100}%"></span>` : '';
       const hol = holiday ? ` · <span class="hol">${escapeHtml(holiday)}</span>` : '';
@@ -241,9 +252,12 @@
     $('month-detail').innerHTML = `${when} · ${shiftLabel(selected)}${hol ? ` · <span class="hol">${escapeHtml(hol)}</span>` : ''}`;
 
     const last = new Date(first.getFullYear(), first.getMonth(), daysIn);
+    let changed = 0;
+    for (let n = 1; n <= daysIn; n++) if (R.isChanged(new Date(first.getFullYear(), first.getMonth(), n))) changed++;
+    const except = changed ? `, apart from ${plural(changed, 'changed day')}` : '';
     $('month-note').textContent = R.isChecked(first) && R.isChecked(last)
-      ? 'Matches the official Shift B roster. The pattern repeats every 4 weeks.'
-      : 'Worked out from the 4-week pattern. Check it against the new roster when it comes out.';
+      ? `Matches the official Shift B roster${except}. The pattern repeats every 4 weeks.`
+      : `Worked out from the 4-week pattern${except}. Check it against the new roster when it comes out.`;
   }
 
   $('month-grid').addEventListener('click', (e) => {

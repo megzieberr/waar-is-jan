@@ -14,6 +14,10 @@ A tiny home-screen app showing whether Jan is at the mine or off duty: Today, We
 3. Add any new public holidays to `HOLIDAYS`.
 4. Bump `VERSION` in `sw.js`, then push.
 
+## One-off changes (swapped days, night shifts)
+
+Add the date to `CHANGES` in `roster.js`, e.g. `'2026-10-26': 'N'` (D, T, N or O). Night shift is 18:00–06:00 and runs into the next morning. The check tool skips these days.
+
 ## Any change
 
 Bump `VERSION` in `sw.js`, or phones keep showing the old copy. Local preview: `waar-is-jan` in the projects folder's `.claude/launch.json` (port 5181).
